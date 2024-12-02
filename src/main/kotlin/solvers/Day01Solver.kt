@@ -1,25 +1,15 @@
-package day01
+package solvers
 
-import common.DaySolver
-import java.net.URL
 import kotlin.collections.map
 import kotlin.collections.unzip
 import kotlin.math.abs
-import kotlin.text.lines
 import kotlin.text.split
 import kotlin.text.toInt
 import kotlin.text.toRegex
 import kotlin.to
 
-fun main() {
-    Day01Solver().print()
-}
-
-class Day01Solver(
-    resourceUrlOverride: URL? = null
-) : DaySolver(resourceUrlOverride) {
+class Day01Solver(input: List<String>) : DaySolver {
     val lists = input
-        .lines()
         .map { it.split("""\s+""".toRegex()) }
         .map { it[0].toInt() to it[1].toInt() }
         .unzip()

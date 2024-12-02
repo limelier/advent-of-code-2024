@@ -1,13 +1,21 @@
-package day02
+package solvers
 
-import day02.Day02Solver.Companion.isSafe
-import day02.Day02Solver.Companion.without
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import solvers.Day02Solver.Companion.isSafe
+import solvers.Day02Solver.Companion.isSafeDampened
+import solvers.Day02Solver.Companion.without
 
 class Day02SolverTest {
-    val testInputUrl = javaClass.getResource("test.txt")!!
-    val solver = Day02Solver(testInputUrl)
+    val testInput = """
+        7 6 4 2 1
+        1 2 7 8 9
+        9 7 6 2 1
+        1 3 2 4 5
+        8 6 4 4 1
+        1 3 6 7 9
+    """.trimIndent().lines()
+    val solver = Day02Solver(testInput)
 
     @Test
     fun `part 1 example should match`() {
@@ -27,7 +35,7 @@ class Day02SolverTest {
     fun `part 2 example should match`() {
         solver.part2() shouldBe 4
 
-        solver.reports.map { it.isSafe(useDampener = true) } shouldBe listOf(
+        solver.reports.map { it.isSafeDampened() } shouldBe listOf(
             true,
             false,
             false,
@@ -40,13 +48,13 @@ class Day02SolverTest {
     @Test
     fun `dampener should work on first element`() {
         val report = listOf(1000, 1, 2, 3, 4, 5)
-        report.isSafe(useDampener = true) shouldBe true
+        report.isSafeDampened() shouldBe true
     }
 
     @Test
     fun `dampener should work on last element`() {
         val report = listOf(1, 2, 3, 4, 5, 1000)
-        report.isSafe(useDampener = true) shouldBe true
+        report.isSafeDampened() shouldBe true
     }
 
     @Test
