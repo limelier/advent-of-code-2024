@@ -1,14 +1,16 @@
 package common
 
+import java.io.IOException
 import java.net.URL
 
 abstract class DaySolver(
     resourceUrlOverride: URL? = null
 ) {
     internal val input =
-        (resourceUrlOverride ?: javaClass.getResource("input.txt")!!)
-        .readText()
-        .trim() // remove trailing newline
+        (resourceUrlOverride ?: javaClass.getResource("input.txt"))
+            ?.readText()
+            ?.trim() // remove trailing newline
+            ?: throw IOException("Missing puzzle input in src/main/day##/input.txt !")
 
     abstract fun part1(): Any
     abstract fun part2(): Any
