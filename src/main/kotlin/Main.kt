@@ -1,4 +1,4 @@
-import solvers.Day02Solver
+import solvers.Day03Solver
 import solvers.DaySolver
 import java.io.File
 
@@ -8,7 +8,7 @@ fun main() {
         .trimEnd() // remove trailing newline
         .lines()
 
-    val solver: DaySolver = Day02Solver(input)
+    val solver: DaySolver = Day03Solver(input)
 
     try {
         println("Part 1:\n${solver.part1()}")
