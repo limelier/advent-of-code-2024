@@ -4,7 +4,7 @@ import kotlin.collections.flatten
 
 class Day03Solver(private val input: List<String>) : DaySolver {
     private val mul = """mul\((?<left>\d+),(?<right>\d+)\)""".toRegex()
-    private val instruction = """(${mul.pattern})|(do\(\))|(don't\(\))""".toRegex()
+    private val instruction = """${mul.pattern}|do\(\)|don't\(\)""".toRegex()
 
     override fun part1(): Any {
         return input.map {
