@@ -2,32 +2,33 @@ package solvers
 
 import common.grid.Dir
 import common.grid.Grid
+import common.grid.Pointer
 import common.grid.Pos
 
 class Day06Solver(input: List<String>) : DaySolver {
     private val data = input.map { it.toCharArray().toTypedArray() }.toTypedArray()
     private val visitedInPartOne = mutableListOf<Pos>()
-    private val part1Grid = Grid(data.deepClone())
-    private val initialPosition = part1Grid.positions().first { part1Grid[it] == '^' }
+    private val grid = Grid(data)
+    private val initialPosition = grid.positions().first { grid[it] == '^' }
 
     override fun part1(): Any {
         var guard = initialPosition
         var dir = Dir.UP
 
-        while (part1Grid.contains(guard)) {
+        while (grid.contains(guard)) {
             val next = guard + dir.delta
-            if (part1Grid[next] == '#') {
+            if (grid[next] == '#') {
                 dir = dir.turnRight()
             } else {
-                if (part1Grid[guard] != 'X') {
+                if (grid[guard] != 'X') {
                     visitedInPartOne += guard
-                    part1Grid[guard] = 'X'
+                    grid[guard] = 'X'
                 }
                 guard = next
             }
         }
 
-        println(part1Grid.printableString())
+        println(grid.printableString())
         return visitedInPartOne.size
     }
 
@@ -36,38 +37,44 @@ class Day06Solver(input: List<String>) : DaySolver {
         return visitedInPartOne
             .subList(1, visitedInPartOne.size) // exclude starting position
             .count { obstaclePosition ->
-                val grid = Grid(data.deepClone())
+                grid[obstaclePosition] = '#'
 
-                var guard = initialPosition
-                var dir = Dir.UP
+                var moveTortoise = false
+                var tortoise = Pointer(initialPosition, Dir.UP)
+                var hare = Pointer(initialPosition, Dir.UP)
 
-                var itLoops = true
-
-                // run until reaching a previously-visited tile from the same direction
-                while (grid[guard] != dir.name[0]) {
-                    // if guard exits grid, there is no loop
-                    if (!grid.contains(guard)) {
-                        itLoops = false
-                        break
+                var loop = false
+                while (hare.pos in grid) {
+                    val hareNext = hare.next()
+                    hare = if (grid[hareNext.pos] == '#' || hareNext.pos == obstaclePosition) {
+                        hare.copy(dir = hare.dir.turnRight())
+                    } else {
+                        hareNext
                     }
 
-                    // write down the direction on the visited tile
-                    grid[guard] = dir.name[0]
-
-                    val next = guard + dir.delta
-                    if (grid[next] == '#') {
-                        dir = dir.turnRight()
+                    if (moveTortoise) {
+                        val tortoiseNext = tortoise.next()
+                        tortoise = if (grid[tortoiseNext.pos] == '#' || tortoiseNext.pos == obstaclePosition) {
+                            tortoise.copy(dir = tortoise.dir.turnRight())
+                        } else {
+                            tortoiseNext
+                        }
+                        moveTortoise = false
                     } else {
-                        guard = next
+                        moveTortoise = true
+                    }
+
+                    if (hare == tortoise) {
+                        loop = true
+                        break
                     }
                 }
 
-                itLoops
+                grid[obstaclePosition] = '.'
+                loop
             }
     }
 }
-
-private fun Array<Array<Char>>.deepClone(): Array<Array<Char>> = this.map { it.clone() }.toTypedArray()
 
 private fun Dir.turnRight(): Dir = when(this) {
     Dir.UP -> Dir.RIGHT
