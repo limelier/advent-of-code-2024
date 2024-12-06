@@ -20,6 +20,11 @@ data class Grid<T>(
         return data[pos.y][pos.x]
     }
 
+    operator fun set(pos: Pos, value: T) {
+        if (!contains(pos)) throw IllegalArgumentException("pos is out of bounds")
+        data[pos.y][pos.x] = value
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -39,5 +44,11 @@ data class Grid<T>(
         result = 31 * result + ys.hashCode()
         result = 31 * result + xs.hashCode()
         return result
+    }
+
+    fun printableString(rowSeparator: CharSequence = "\n", colSeparator: CharSequence = ""): String {
+        return data.joinToString(rowSeparator) { row ->
+            row.joinToString(colSeparator)
+        }
     }
 }
