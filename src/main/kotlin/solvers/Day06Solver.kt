@@ -32,6 +32,7 @@ class Day06Solver(input: List<String>) : DaySolver {
     }
 
     override fun part2(): Any {
+        // only positions that the guard visits normally should be considered for the extra obstacles
         return visitedInPartOne
             .subList(1, visitedInPartOne.size) // exclude starting position
             .count { obstaclePosition ->
@@ -41,6 +42,8 @@ class Day06Solver(input: List<String>) : DaySolver {
                 var dir = Dir.UP
 
                 var itLoops = true
+
+                // run until reaching a previously-visited tile from the same direction
                 while (grid[guard] != dir.name[0]) {
                     // if guard exits grid, there is no loop
                     if (!grid.contains(guard)) {
@@ -48,6 +51,7 @@ class Day06Solver(input: List<String>) : DaySolver {
                         break
                     }
 
+                    // write down the direction on the visited tile
                     grid[guard] = dir.name[0]
 
                     val next = guard + dir.delta
