@@ -32,21 +32,25 @@ class Day06Solver(input: List<String>) : DaySolver {
     }
 
     override fun part2(): Any {
+        val grid = Grid(data.deepClone())
         return visitedInPartOne
             .subList(1, visitedInPartOne.size) // exclude starting position
             .count { obstaclePosition ->
-                val grid = Grid(data.deepClone())
                 grid[obstaclePosition] = '#'
 
                 var guard = initialPosition
                 var dir = Dir.UP
                 val visited: MutableSet<Pair<Pos, Dir>> = mutableSetOf()
 
+                var itLoops = true
                 while (guard to dir !in visited) {
                     visited += guard to dir
 
                     // if guard exits grid, there is no loop
-                    if (!grid.contains(guard)) return@count false
+                    if (!grid.contains(guard)) {
+                        itLoops = false
+                        break
+                    }
 
                     val next = guard + dir.delta
                     if (grid[next] == '#') {
@@ -56,8 +60,9 @@ class Day06Solver(input: List<String>) : DaySolver {
                     }
                 }
 
-                // there is a loop
-                true
+                grid[obstaclePosition] = '.'
+
+                itLoops
             }
     }
 }
