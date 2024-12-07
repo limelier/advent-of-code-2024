@@ -13,7 +13,8 @@ data class Grid<T>(
     val xs = data.first().indices
 
     fun positions(): Sequence<Pos> = sequence { xs.forEach { x -> ys.forEach { y -> yield(Pos(x, y)) }}}
-    fun contains(pos: Pos): Boolean = pos.x in xs && pos.y in ys
+
+    operator fun contains(pos: Pos): Boolean = pos.x in xs && pos.y in ys
 
     operator fun get(pos: Pos): T? {
         if (!contains(pos)) return null

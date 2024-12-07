@@ -13,6 +13,8 @@ enum class Dir(
     DOWN_RIGHT(Delta(1, 1)),
     ;
 
-    val orthogonal get() = listOf(UP, DOWN, LEFT, RIGHT)
-    val diagonal get() = listOf(UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT)
+    companion object {
+        val orthogonal get() = listOf(UP, DOWN, LEFT, RIGHT)
+        val diagonal get() = listOf(UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT)
+    }
 }
