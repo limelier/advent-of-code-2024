@@ -5,7 +5,7 @@ class Day07Solver(input: List<String>) : DaySolver {
         val (before, after) = line.split(": ")
         val testValue = before.toLong()
         val terms = after.split(" ").map { it.toLong() }
-        Equation(testValue, terms)
+        Equation(testValue, terms.subList(1, terms.size), terms[0])
     }
 
     override fun part1(): Any {
@@ -23,15 +23,19 @@ class Day07Solver(input: List<String>) : DaySolver {
 
 private data class Equation(
     val testValue: Long,
-    val terms: List<Long>
+    val terms: List<Long>,
+    val accumulator: Long,
 ) {
-    fun applyOperator(operator: Operator): Equation =
-        Equation(testValue, listOf(operator(terms[0], terms[1])) + terms.subList(2, terms.size))
+    fun applyOperator(operator: Operator): Equation = Equation(
+        testValue,
+        terms.subList(1, terms.size),
+        operator(accumulator, terms[0])
+    )
 
-    fun possible(vararg operators: Operator): Boolean = if (terms.size == 1) {
-        testValue == terms[0]
+    fun possible(vararg operators: Operator): Boolean = if (terms.isEmpty()) {
+        testValue == accumulator
     } else {
-        testValue >= terms[0] && operators.any { op -> applyOperator(op).possible(*operators) }
+        testValue >= accumulator && operators.any { op -> applyOperator(op).possible(*operators) }
     }
 }
 
