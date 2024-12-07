@@ -36,27 +36,20 @@ class Day06Solver(input: List<String>) : DaySolver {
         val viableWallLocations = visitedInPartOne
             .subList(1, visitedInPartOne.size) // cannot place wall on starting position
             .count { wallPos ->
-                var guard = Pointer(initialPosition, Dir.UP)
-                val history = mutableSetOf<Pointer>()
+                var hare = Pointer(initialPosition, Dir.UP)
+                var tortoise = Pointer(initialPosition, Dir.UP)
+                var moveTortoise = false
 
-                while (guard.pos in grid) {
-                    if (guard in history) return@count true
-                    history += guard
+                while (hare.pos in grid) {
+                    hare = hare.teleport(wallPos, teleportGrids)
+                    if (moveTortoise) {
+                        tortoise = tortoise.teleport(wallPos, teleportGrids)
+                        moveTortoise = false
+                    } else {
+                        moveTortoise = true
+                    }
 
-                    guard = Pointer(
-                        if (guard.isFacing(wallPos)) {
-                            val posInFrontOfWall = wallPos - guard.dir.delta
-                            val posByTeleportGrid = teleportGrids[guard.dir]!![guard.pos]!!
-
-                            val distanceToNewWall = taxicabDistance(guard.pos, posInFrontOfWall)
-                            val distanceToOldWall = taxicabDistance(guard.pos, posByTeleportGrid)
-
-                            if (distanceToNewWall < distanceToOldWall) posInFrontOfWall else posByTeleportGrid
-                        } else {
-                            teleportGrids[guard.dir]!![guard.pos]!!
-                        },
-                        guard.dir.turnedRight()
-                    )
+                    if (hare == tortoise) return@count true
                 }
 
                 false
@@ -104,6 +97,20 @@ private fun generateTeleportGrids(grid: Grid<Char>): Map<Dir, Grid<Pos>> = Dir.o
     dir to teleportGrid
 }
 
+private fun Pointer.teleport(wallPos: Pos, teleportGrids: Map<Dir, Grid<Pos>>): Pointer = Pointer(
+    pos = if (isFacing(wallPos)) {
+        val posInFrontOfWall = wallPos - dir.delta
+        val posByTeleportGrid = teleportGrids[dir]!![pos]!!
+
+        val distanceToNewWall = taxicabDistance(pos, posInFrontOfWall)
+        val distanceToOldWall = taxicabDistance(pos, posByTeleportGrid)
+
+        if (distanceToNewWall < distanceToOldWall) posInFrontOfWall else posByTeleportGrid
+    } else {
+        teleportGrids[dir]!![pos]!!
+    },
+    dir = dir.turnedRight()
+)
 
 private fun Dir.turnedRight(): Dir = when(this) {
     Dir.UP -> Dir.RIGHT
