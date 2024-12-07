@@ -8,16 +8,16 @@ class Day07Solver(input: List<String>) : DaySolver {
         Equation(testValue, terms.subList(1, terms.size), terms[0])
     }
 
+    private val partitions = equations.partition { it.possible(::add, ::mul) }
+    val part1 = partitions.first.sumOf { it.testValue }
+    val part2 = part1 + partitions.second.filter { it.possible(::add, ::mul, ::cat) }.sumOf { it.testValue }
+
     override fun part1(): Any {
-        return equations
-            .filter { it.possible(::add, ::mul) }
-            .sumOf { it.testValue }
+        return part1
     }
 
     override fun part2(): Any {
-        return equations
-            .filter { it.possible(::add, ::mul, ::cat) }
-            .sumOf { it.testValue }
+        return part2
     }
 }
 
