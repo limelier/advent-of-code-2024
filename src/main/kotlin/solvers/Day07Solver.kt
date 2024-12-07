@@ -8,10 +8,10 @@ class Day07Solver(input: List<String>) : DaySolver {
         Equation(testValue, terms.subList(1, terms.size), terms[0])
     }
 
-    private val partitions = equations.partition { it.possible(::add, ::mul) }
+    private val partitions = equations.partition { it.possible(::mul, ::add) }
     val part1 = partitions.first.sumOf { it.testValue }
     // part 2: if an equation is possible with two operators, it's possible with three. only check the ones that aren't
-    val part2 = part1 + partitions.second.filter { it.possible(::add, ::mul, ::cat) }.sumOf { it.testValue }
+    val part2 = part1 + partitions.second.filter { it.possible(::cat, ::mul, ::add) }.sumOf { it.testValue }
 
     override fun part1(): Any {
         return part1
