@@ -1,5 +1,7 @@
 package common.grid
 
+import kotlin.math.abs
+
 data class Pair(
     val x: Int,
     val y: Int,
@@ -10,6 +12,8 @@ data class Pair(
 
     override fun toString(): String = "($x,$y)"
 }
+
+fun taxicabDistance(first: Pair, second: Pair): Int = abs(first.x - second.x) + abs(first.y - second.y)
 
 typealias Pos = Pair
 typealias Delta = Pair

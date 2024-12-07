@@ -4,7 +4,7 @@ import common.grid.Dir
 import common.grid.Grid
 import common.grid.Pointer
 import common.grid.Pos
-import kotlin.math.abs
+import common.grid.taxicabDistance
 
 class Day06Solver(input: List<String>) : DaySolver {
     private val data = input.map { it.toCharArray().toTypedArray() }.toTypedArray()
@@ -48,8 +48,8 @@ class Day06Solver(input: List<String>) : DaySolver {
                             val posInFrontOfWall = wallPos - guard.dir.delta
                             val posByTeleportGrid = teleportGrids[guard.dir]!![guard.pos]!!
 
-                            val distanceToNewWall = orthogonalDistance(guard.dir, guard.pos, posInFrontOfWall)
-                            val distanceToOldWall = orthogonalDistance(guard.dir, guard.pos, posByTeleportGrid)
+                            val distanceToNewWall = taxicabDistance(guard.pos, posInFrontOfWall)
+                            val distanceToOldWall = taxicabDistance(guard.pos, posByTeleportGrid)
 
                             if (distanceToNewWall < distanceToOldWall) posInFrontOfWall else posByTeleportGrid
                         } else {
@@ -121,8 +121,3 @@ private fun Pointer.isFacing(target: Pos): Boolean = when(this.dir) {
     else -> throw IllegalArgumentException("don't need non-orthogonal dirs")
 }
 
-private fun orthogonalDistance(dir: Dir, first: Pos, second: Pos): Int = when(dir) {
-    Dir.UP, Dir.DOWN -> abs(first.y - second.y)
-    Dir.LEFT, Dir.RIGHT -> abs(first.x - second.x)
-    else -> throw IllegalArgumentException("dir is non-orthogonal")
-}
