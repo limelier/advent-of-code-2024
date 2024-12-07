@@ -4,6 +4,7 @@ import common.grid.Dir
 import common.grid.Grid
 import common.grid.Pointer
 import common.grid.Pos
+import kotlin.math.abs
 
 class Day06Solver(input: List<String>) : DaySolver {
     private val data = input.map { it.toCharArray().toTypedArray() }.toTypedArray()
@@ -28,7 +29,6 @@ class Day06Solver(input: List<String>) : DaySolver {
             }
         }
 
-        println(grid.printableString())
         return visitedInPartOne.size
     }
 
@@ -45,7 +45,13 @@ class Day06Solver(input: List<String>) : DaySolver {
 
                     guard = Pointer(
                         if (guard.isFacing(wallPos)) {
-                            wallPos - guard.dir.delta
+                            val posInFrontOfWall = wallPos - guard.dir.delta
+                            val posByTeleportGrid = teleportGrids[guard.dir]!![guard.pos]!!
+
+                            val distanceToNewWall = orthogonalDistance(guard.dir, guard.pos, posInFrontOfWall)
+                            val distanceToOldWall = orthogonalDistance(guard.dir, guard.pos, posByTeleportGrid)
+
+                            if (distanceToNewWall < distanceToOldWall) posInFrontOfWall else posByTeleportGrid
                         } else {
                             teleportGrids[guard.dir]!![guard.pos]!!
                         },
@@ -53,10 +59,8 @@ class Day06Solver(input: List<String>) : DaySolver {
                     )
                 }
 
-                grid[wallPos] = 'O'
                 false
             }
-        println(grid.printableString())
         return viableWallLocations
     }
 }
@@ -109,10 +113,16 @@ private fun Dir.turnedRight(): Dir = when(this) {
     else -> throw IllegalArgumentException("don't need non-orthogonal dirs")
 }
 
-fun Pointer.isFacing(target: Pos): Boolean = when(this.dir) {
+private fun Pointer.isFacing(target: Pos): Boolean = when(this.dir) {
     Dir.UP -> pos.x == target.x && pos.y > target.y
     Dir.RIGHT -> pos.x < target.x && pos.y == target.y
     Dir.DOWN -> pos.x == target.x && pos.y < target.y
     Dir.LEFT -> pos.x > target.x && pos.y == target.y
     else -> throw IllegalArgumentException("don't need non-orthogonal dirs")
+}
+
+private fun orthogonalDistance(dir: Dir, first: Pos, second: Pos): Int = when(dir) {
+    Dir.UP, Dir.DOWN -> abs(first.y - second.y)
+    Dir.LEFT, Dir.RIGHT -> abs(first.x - second.x)
+    else -> throw IllegalArgumentException("dir is non-orthogonal")
 }
