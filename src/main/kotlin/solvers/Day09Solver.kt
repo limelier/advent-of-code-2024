@@ -1,5 +1,8 @@
 package solvers
 
+import common.linkedList.LinkedList
+import common.linkedList.LinkedList.Companion.toLinkedList
+
 class Day09Solver(input: List<String>) : DaySolver {
     private val segments: List<Segment>
     private val maxId: Int
@@ -41,68 +44,37 @@ class Day09Solver(input: List<String>) : DaySolver {
     }
 
     override fun part2(): Any {
-        // head.data will NEVER be Segment.Empty
-        val head = segments.toDoublyLinkedList()
+        val list = LinkedList(segments)
 
-        var file: Node? = let {
-            var node = head
-            while (node.next != null) node = node.next!!
-            while (node.data !is Segment.File) node = node.prev!!
-            node
-        }
+        var fileNode = list.tail
 
-        outer@ while (file != null) {
-            if (file.data !is Segment.File) {
-                file = file.prev
+        while (fileNode != null) {
+            if (fileNode.value !is Segment.File) {
+                fileNode = fileNode.prev
                 continue
             }
 
             // find first empty of right size, searching up to file itself
-            var empty: Node = head
-            while (empty != file) {
-                if (empty.data is Segment.Empty && empty.data.size >= file.data.size)
-                    break
-                empty = empty.next!!
+            var emptyNode = list.head!!.nextUntil {
+                it == fileNode || (it.value is Segment.Empty && it.value.size >= fileNode!!.value.size)
             }
             // none found -> go to next file
-            if (empty == file) {
-                file = file.prev
+            if (emptyNode == fileNode) {
+                fileNode = fileNode.prev
                 continue
             }
 
-            // insert new file into empty
-            val newFile = Node(file.data, prev = empty.prev, next = empty.next)
-            empty.prev?.next = newFile
-
-            // create a new empty with the remainder of the empty space, if any.
-            if (file.data.size < empty.data.size) {
-                val newEmpty = Node(Segment.Empty(empty.data.size - file.data.size), newFile, empty.next)
-                newFile.next = newEmpty
-                empty.next?.prev = newEmpty
-            } else {
-                empty.next?.prev = newFile
+            val splicedList = mutableListOf<Segment>((fileNode.value as Segment.File).copy())
+            if (emptyNode!!.value.size > fileNode.value.size) {
+                splicedList.add(Segment.Empty(emptyNode.value.size - fileNode.value.size))
             }
+            list.splice(emptyNode, splicedList.toLinkedList())
 
-            // empty has been orphaned, will be cleaned up by GC
-
-            // replace file with empty
-            val fileEmpty = Node(Segment.Empty(file.data.size), file.prev, file.next)
-            file.prev?.next = fileEmpty
-            file.next?.prev = fileEmpty
-
-            // file has been orphaned, will be cleaned up by GC
-
-            file = file.prev
-            while (file != null && file.data !is Segment.File) file = file.prev
+            fileNode.value = Segment.Empty(fileNode.value.size)
         }
 
         // finally, calculate and return checksum
-        val blocks = mutableListOf<Int>()
-        var node: Node? = head
-        while (node != null) {
-            blocks += node!!.data.blocks()
-            node = node!!.next
-        }
+        val blocks = list.toBlocks()
         return blocks.checksum()
     }
 }
@@ -120,27 +92,6 @@ private abstract class Segment(
         override fun blocks(): List<Int> = List(size) { -1 }
         override fun toString(): String = "<$size>"
     }
-}
-
-private class Node(
-    val data: Segment,
-    var prev: Node? = null,
-    var next: Node? = null,
-) {
-    override fun toString(): String = "$data-" + (next?.toString() ?: "")
-}
-
-private fun List<Segment>.toDoublyLinkedList(): Node {
-    val head = Node(first())
-    var tail = head
-
-    subList(1, size).forEach {
-        val node = Node(it, prev = tail)
-        tail.next = node
-        tail = node
-    }
-
-    return head
 }
 
 private fun List<Int>.checksum(): Long = mapIndexed { index, id -> if (id == -1) 0 else index.toLong() * id }.sum()
