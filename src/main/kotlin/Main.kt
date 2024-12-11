@@ -1,4 +1,4 @@
-import solvers.Day10Solver
+import solvers.Day11Solver
 import solvers.DaySolver
 import java.io.File
 import kotlin.time.measureTime
@@ -10,7 +10,7 @@ fun main() {
         .lines()
 
     val time = measureTime {
-        val solver: DaySolver = Day10Solver(input)
+        val solver: DaySolver = Day11Solver(input)
 
         try {
             println("Part 1:\n${solver.part1()}")
