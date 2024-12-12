@@ -13,6 +13,17 @@ enum class Dir(
     DOWN_RIGHT(Delta(1, 1)),
     ;
 
+    override fun toString(): String = when(this) {
+        UP -> "↑"
+        DOWN -> "↓"
+        LEFT -> "←"
+        RIGHT -> "→"
+        UP_LEFT -> "↖"
+        UP_RIGHT -> "↗"
+        DOWN_LEFT -> "↙"
+        DOWN_RIGHT -> "↘"
+    }
+
     companion object {
         val orthogonal get() = listOf(UP, DOWN, LEFT, RIGHT)
         val diagonal get() = listOf(UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT)
